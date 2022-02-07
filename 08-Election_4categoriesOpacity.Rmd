@@ -1,0 +1,29 @@
+# Election Map: 4 Categories Opacity by Log of Total Votes
+
+The map on the previous page suffers from "land doesn't vote, people do" type bias. 
+The map on this page attempts to correct for that bias by setting the opacity based on the total number of votes in that county. 
+It uses a log scale because otherwise, you only see a few counties (LA, Chicago, a few others).
+A version that doesn't use a log scale is shown on the following page. 
+
+```{r, message=FALSE, warning=FALSE}
+## Now use 4 custom-labeled factors, with opacity set based on total votes (re-scaled after log)
+pal <- colorNumeric(
+  palette = colorRampPalette(c('red', 'white', 'blue'))(length(countyGIS$pctGOP)), 
+  domain = countyGIS$pctGOP, reverse=TRUE)
+
+factorPal <- colorFactor(c("blue", "cyan", "magenta", "red"), countyGIS$pctGOPcategories )
+
+leaflet(countyGIS, options = leafletOptions(crsClass = "L.CRS.EPSG3857"), width="100%") %>%
+  addPolygons(weight = 0.5, color = "gray", opacity = 0.7,
+    fillColor = ~factorPal(pctGOPcategories), fillOpacity = countyGIS$stdVotesLog, smoothFactor = 0.5,
+    label = popupLabels,
+    labelOptions = labelOptions(direction = "auto")) %>%
+    addPolygons(data = stateGIS,fill = FALSE,color="black",weight = 1) %>%
+    addLegend(pal = factorPal,values = ~countyGIS$pctGOPcategories, opacity = 0.7, title = "% Trump",position = "bottomright")
+
+```
+
+This map is similar to the previous map, except the opacity is scaled by the total number of votes, re-scaled to be between 0 and 1 after taking the log. This is similar to the ["Value-by-alpha" map" shown in this article](https://www.wired.com/story/is-us-leaning-red-or-blue-election-maps/). 
+
+To give you a better sense of the population distribution in the US, the following page does not use a log scale (so extreme values are all you see), and the final page has a map of total votes (instead of vote percentage). 
+

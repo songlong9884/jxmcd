@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>2 Create Dataset | Creating Interactive Maps of Census Data Using Leaflet and Tidycensus</title>
+  <meta name="description" content="2 Create Dataset | Creating Interactive Maps of Census Data Using Leaflet and Tidycensus" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="2 Create Dataset | Creating Interactive Maps of Census Data Using Leaflet and Tidycensus" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="2 Create Dataset | Creating Interactive Maps of Census Data Using Leaflet and Tidycensus" />
+  
+  
+  
+
+
+
+<meta name="date" content="2022-01-28" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="census-data-from-the-tidycensus-package.html"/>
+<link rel="next" href="election-map-bins.html"/>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<link href="libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
+<script src="libs/leaflet-1.3.1/leaflet.js"></script>
+<link href="libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
+<script src="libs/proj4-2.6.2/proj4.min.js"></script>
+<script src="libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+<link href="libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
+<script src="libs/leaflet-binding-2.0.4.1/leaflet.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#practice-this-process"><i class="fa fa-check"></i>Practice this process</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#datacamp"><i class="fa fa-check"></i>DataCamp</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#bookdown-options"><i class="fa fa-check"></i>Bookdown Options</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#new-sentence-new-line"><i class="fa fa-check"></i>New Sentence, New Line</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#rstudio-cloud-memory"><i class="fa fa-check"></i>RStudio Cloud Memory</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#use-this-for-your-cp"><i class="fa fa-check"></i>Use this for your CP</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="census-data-from-the-tidycensus-package.html"><a href="census-data-from-the-tidycensus-package.html"><i class="fa fa-check"></i><b>1</b> Census Data from the Tidycensus Package</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="census-data-from-the-tidycensus-package.html"><a href="census-data-from-the-tidycensus-package.html#figure-out-how-to-get-multiple-variables-at-one-time"><i class="fa fa-check"></i><b>1.1</b> Figure out how to get multiple variables at one time</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="create-dataset.html"><a href="create-dataset.html"><i class="fa fa-check"></i><b>2</b> Create Dataset</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="create-dataset.html"><a href="create-dataset.html#gis-data-download-and-preparation"><i class="fa fa-check"></i><b>2.1</b> GIS data download and preparation</a></li>
+<li class="chapter" data-level="2.2" data-path="create-dataset.html"><a href="create-dataset.html#election-data-download-and-preparation"><i class="fa fa-check"></i><b>2.2</b> Election data download and preparation</a></li>
+<li class="chapter" data-level="2.3" data-path="create-dataset.html"><a href="create-dataset.html#popup-labels"><i class="fa fa-check"></i><b>2.3</b> Popup labels</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="election-map-bins.html"><a href="election-map-bins.html"><i class="fa fa-check"></i><b>3</b> Election Map: Bins</a></li>
+<li class="chapter" data-level="4" data-path="election-map-custom-bins.html"><a href="election-map-custom-bins.html"><i class="fa fa-check"></i><b>4</b> Election Map: Custom Bins</a></li>
+<li class="chapter" data-level="5" data-path="election-map-continuous-with-2-colors.html"><a href="election-map-continuous-with-2-colors.html"><i class="fa fa-check"></i><b>5</b> Election Map: Continuous with 2 Colors</a></li>
+<li class="chapter" data-level="6" data-path="election-map-continuous-with-3-colors.html"><a href="election-map-continuous-with-3-colors.html"><i class="fa fa-check"></i><b>6</b> Election Map: Continuous with 3 Colors</a></li>
+<li class="chapter" data-level="7" data-path="election-map-4-categories.html"><a href="election-map-4-categories.html"><i class="fa fa-check"></i><b>7</b> Election Map: 4 Categories</a></li>
+<li class="chapter" data-level="8" data-path="election-map-4-categories-opacity-by-log-of-total-votes.html"><a href="election-map-4-categories-opacity-by-log-of-total-votes.html"><i class="fa fa-check"></i><b>8</b> Election Map: 4 Categories Opacity by Log of Total Votes</a></li>
+<li class="chapter" data-level="9" data-path="election-map-4-categories-opacity-by-total-votes.html"><a href="election-map-4-categories-opacity-by-total-votes.html"><i class="fa fa-check"></i><b>9</b> Election Map: 4 Categories Opacity by Total Votes</a></li>
+<li class="chapter" data-level="10" data-path="total-votes-map.html"><a href="total-votes-map.html"><i class="fa fa-check"></i><b>10</b> Total Votes Map</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Creating Interactive Maps of Census Data Using Leaflet and Tidycensus</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="create-dataset" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Create Dataset</h1>
+<p>Now that you know how to use the tidycensus package download data from the US Census Bureau using the Census API, we are ready to put together the data we need to make an interactive map.</p>
+<div id="gis-data-download-and-preparation" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> GIS data download and preparation</h2>
+<p>First we’re going to download the geographic data we need to create maps.
+See the comments in the code below for explanations of what each part is doing.
+I kept it all together in one code chunk with comments to make it easier to re-use elsewhere (e.g., as part of your CP).</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="create-dataset.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="create-dataset.html#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(leaflet)</span>
+<span id="cb1-3"><a href="create-dataset.html#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rmapshaper)</span>
+<span id="cb1-4"><a href="create-dataset.html#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidycensus)</span>
+<span id="cb1-5"><a href="create-dataset.html#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">tigris_use_cache =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-6"><a href="create-dataset.html#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="create-dataset.html#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="do">## turn off scientific notation</span></span>
+<span id="cb1-8"><a href="create-dataset.html#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">scipen =</span> <span class="dv">999</span>)</span>
+<span id="cb1-9"><a href="create-dataset.html#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="create-dataset.html#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="create-dataset.html#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="do">## Download GIS data for maps</span></span>
+<span id="cb1-12"><a href="create-dataset.html#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="do">##   geometry = TRUE --&gt; include GIS shapefile data to create maps</span></span>
+<span id="cb1-13"><a href="create-dataset.html#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="do">##   B01001_001: total population</span></span>
+<span id="cb1-14"><a href="create-dataset.html#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="do">##   </span><span class="al">NOTE</span><span class="do">: When you download the county data for the regressions, use options: geometry = False, keep_geo_vars = FALSE</span></span>
+<span id="cb1-15"><a href="create-dataset.html#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="create-dataset.html#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Median household income</span></span>
+<span id="cb1-17"><a href="create-dataset.html#cb1-17" aria-hidden="true" tabindex="-1"></a>countyGIS <span class="ot">&lt;-</span> <span class="fu">get_acs</span>(<span class="at">geography =</span> <span class="st">&quot;county&quot;</span>,</span>
+<span id="cb1-18"><a href="create-dataset.html#cb1-18" aria-hidden="true" tabindex="-1"></a>              <span class="at">variables =</span> <span class="st">&quot;B01001_001&quot;</span>,</span>
+<span id="cb1-19"><a href="create-dataset.html#cb1-19" aria-hidden="true" tabindex="-1"></a>              <span class="at">geometry =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-20"><a href="create-dataset.html#cb1-20" aria-hidden="true" tabindex="-1"></a>              <span class="at">keep_geo_vars =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-21"><a href="create-dataset.html#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="create-dataset.html#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># State data (for displaying state borders on map)</span></span>
+<span id="cb1-23"><a href="create-dataset.html#cb1-23" aria-hidden="true" tabindex="-1"></a>stateGIS <span class="ot">&lt;-</span> <span class="fu">get_acs</span>(<span class="at">geography =</span> <span class="st">&quot;state&quot;</span>,</span>
+<span id="cb1-24"><a href="create-dataset.html#cb1-24" aria-hidden="true" tabindex="-1"></a>              <span class="at">variables =</span> <span class="st">&quot;B01001_001&quot;</span>,</span>
+<span id="cb1-25"><a href="create-dataset.html#cb1-25" aria-hidden="true" tabindex="-1"></a>              <span class="at">geometry =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-26"><a href="create-dataset.html#cb1-26" aria-hidden="true" tabindex="-1"></a>              <span class="at">keep_geo_vars =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-27"><a href="create-dataset.html#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="create-dataset.html#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="create-dataset.html#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="do">## Simplify GIS data to make file sizes smaller. This essentially removes some details along coastlines and very-not-straight borders. </span></span>
+<span id="cb1-30"><a href="create-dataset.html#cb1-30" aria-hidden="true" tabindex="-1"></a>stateGIS <span class="ot">&lt;-</span> <span class="fu">ms_simplify</span>(stateGIS, <span class="at">keep =</span> <span class="fl">0.01</span>)</span>
+<span id="cb1-31"><a href="create-dataset.html#cb1-31" aria-hidden="true" tabindex="-1"></a>countyGIS <span class="ot">&lt;-</span> <span class="fu">ms_simplify</span>(countyGIS, <span class="at">keep =</span> <span class="fl">0.01</span>)</span>
+<span id="cb1-32"><a href="create-dataset.html#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="create-dataset.html#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="create-dataset.html#cb1-34" aria-hidden="true" tabindex="-1"></a>countyGIS <span class="ot">&lt;-</span> countyGIS <span class="sc">%&gt;%</span> </span>
+<span id="cb1-35"><a href="create-dataset.html#cb1-35" aria-hidden="true" tabindex="-1"></a>                <span class="fu">select</span>(<span class="at">FIPS =</span> GEOID, </span>
+<span id="cb1-36"><a href="create-dataset.html#cb1-36" aria-hidden="true" tabindex="-1"></a>                       <span class="at">stFIPS =</span> STATEFP, </span>
+<span id="cb1-37"><a href="create-dataset.html#cb1-37" aria-hidden="true" tabindex="-1"></a>                       <span class="at">coFIPS =</span> COUNTYFP, </span>
+<span id="cb1-38"><a href="create-dataset.html#cb1-38" aria-hidden="true" tabindex="-1"></a>                       <span class="at">coNAME =</span> NAME.x, </span>
+<span id="cb1-39"><a href="create-dataset.html#cb1-39" aria-hidden="true" tabindex="-1"></a>                       <span class="at">pop =</span> estimate, </span>
+<span id="cb1-40"><a href="create-dataset.html#cb1-40" aria-hidden="true" tabindex="-1"></a>                       geometry)</span>
+<span id="cb1-41"><a href="create-dataset.html#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="create-dataset.html#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="create-dataset.html#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="do">## For mapping, let&#39;s drop the following: </span></span>
+<span id="cb1-44"><a href="create-dataset.html#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="do">##   Puerto Rico (ST FIPS 72) (no election data)</span></span>
+<span id="cb1-45"><a href="create-dataset.html#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="do">##   Alaska (ST FIPS 02) (voting data isn&#39;t reported by county...we could also map the legislative districts, but we&#39;re not going to since we&#39;d rather have smaller maps without those extra details)</span></span>
+<span id="cb1-46"><a href="create-dataset.html#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="do">##   Hawaii (ST FIPS 15) (so our map can zoom in on continental 48 states)</span></span>
+<span id="cb1-47"><a href="create-dataset.html#cb1-47" aria-hidden="true" tabindex="-1"></a>countyGIS <span class="ot">&lt;-</span> countyGIS <span class="sc">%&gt;%</span> <span class="fu">filter</span>(stFIPS <span class="sc">!=</span> <span class="st">&quot;72&quot;</span> <span class="sc">&amp;</span> stFIPS <span class="sc">!=</span> <span class="st">&quot;02&quot;</span> <span class="sc">&amp;</span> stFIPS <span class="sc">!=</span> <span class="st">&quot;15&quot;</span>)</span>
+<span id="cb1-48"><a href="create-dataset.html#cb1-48" aria-hidden="true" tabindex="-1"></a>stateGIS <span class="ot">&lt;-</span> stateGIS <span class="sc">%&gt;%</span> <span class="fu">filter</span>(GEOID <span class="sc">!=</span> <span class="st">&quot;72&quot;</span> <span class="sc">&amp;</span> GEOID <span class="sc">!=</span> <span class="st">&quot;02&quot;</span> <span class="sc">&amp;</span> GEOID <span class="sc">!=</span> <span class="st">&quot;15&quot;</span>)</span>
+<span id="cb1-49"><a href="create-dataset.html#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="create-dataset.html#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="create-dataset.html#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="do">## join 2-character state abbreviation and create name = &quot;county, St&quot; for labeling maps (e.g., Outagamie, WI) </span></span>
+<span id="cb1-52"><a href="create-dataset.html#cb1-52" aria-hidden="true" tabindex="-1"></a>fipsToSTcode <span class="ot">&lt;-</span> fips_codes <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="at">stFIPS =</span> state_code, <span class="at">stNAME =</span> state) <span class="sc">%&gt;%</span> <span class="fu">unique</span>()</span>
+<span id="cb1-53"><a href="create-dataset.html#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="create-dataset.html#cb1-54" aria-hidden="true" tabindex="-1"></a>countyGIS <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(countyGIS,fipsToSTcode,<span class="at">by=</span><span class="st">&quot;stFIPS&quot;</span>)</span>
+<span id="cb1-55"><a href="create-dataset.html#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="create-dataset.html#cb1-56" aria-hidden="true" tabindex="-1"></a>countyGIS <span class="ot">&lt;-</span> countyGIS <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">paste0</span>(coNAME,<span class="st">&quot;, &quot;</span>, stNAME))</span>
+<span id="cb1-57"><a href="create-dataset.html#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-58"><a href="create-dataset.html#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="create-dataset.html#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-60"><a href="create-dataset.html#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="do">## </span><span class="al">NOTE</span><span class="do">: If you don&#39;t use keep_geo_vars = TRUE, you don&#39;t get separate STATEFP and COUNTYFP, but you can use mutate() and create stFIPS = substr(GEOID,1,2) and coFIPS = substr(GEOID,3,5)</span></span></code></pre></div>
+</div>
+<div id="election-data-download-and-preparation" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Election data download and preparation</h2>
+<p>Now we’re going to download 2020 county-level election results from a GitHub repo.
+You can read more about the data <a href="https://github.com/tonmcg/US_County_Level_Election_Results_08-20">in the repo</a>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="create-dataset.html#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 2020 Election data</span></span>
+<span id="cb2-2"><a href="create-dataset.html#cb2-2" aria-hidden="true" tabindex="-1"></a>dta2020 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/tonmcg/US_County_Level_Election_Results_08-20/master/2020_US_County_Level_Presidential_Results.csv&quot;</span>)</span>
+<span id="cb2-3"><a href="create-dataset.html#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="create-dataset.html#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Calculate percentages based on total votes for Trump and Biden (GOP and Dem) only</span></span>
+<span id="cb2-5"><a href="create-dataset.html#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="do">##   In some years there have been ties, so we&#39;re allowing for that</span></span>
+<span id="cb2-6"><a href="create-dataset.html#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="do">##   stdVotes and stdVotesLog will be used to scale color opacity from 0 to 1 based on total votes</span></span>
+<span id="cb2-7"><a href="create-dataset.html#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="create-dataset.html#cb2-8" aria-hidden="true" tabindex="-1"></a>dta2020 <span class="ot">&lt;-</span> dta2020 <span class="sc">%&gt;%</span> </span>
+<span id="cb2-9"><a href="create-dataset.html#cb2-9" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">pctGOP =</span> votes_gop<span class="sc">/</span>(votes_gop <span class="sc">+</span> votes_dem),</span>
+<span id="cb2-10"><a href="create-dataset.html#cb2-10" aria-hidden="true" tabindex="-1"></a>                   <span class="at">totalVotes =</span> votes_gop <span class="sc">+</span> votes_dem,</span>
+<span id="cb2-11"><a href="create-dataset.html#cb2-11" aria-hidden="true" tabindex="-1"></a>                   <span class="at">winner =</span> <span class="fu">ifelse</span>(dta2020<span class="sc">$</span>votes_gop <span class="sc">&gt;</span> dta2020<span class="sc">$</span>votes_dem,<span class="st">&quot;Trump&quot;</span>,</span>
+<span id="cb2-12"><a href="create-dataset.html#cb2-12" aria-hidden="true" tabindex="-1"></a>                                   <span class="fu">ifelse</span>(dta2020<span class="sc">$</span>votes_gop <span class="sc">&lt;</span> dta2020<span class="sc">$</span>votes_dem,<span class="st">&quot;Biden&quot;</span>, </span>
+<span id="cb2-13"><a href="create-dataset.html#cb2-13" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">&quot;Tie&quot;</span>)),</span>
+<span id="cb2-14"><a href="create-dataset.html#cb2-14" aria-hidden="true" tabindex="-1"></a>                   <span class="at">pctWinner =</span> <span class="fu">ifelse</span>(dta2020<span class="sc">$</span>votes_gop <span class="sc">&gt;</span> dta2020<span class="sc">$</span>votes_dem,pctGOP,<span class="dv">1</span><span class="sc">-</span>pctGOP),</span>
+<span id="cb2-15"><a href="create-dataset.html#cb2-15" aria-hidden="true" tabindex="-1"></a>                   <span class="at">FontColorWinner =</span> <span class="fu">ifelse</span>(dta2020<span class="sc">$</span>votes_gop <span class="sc">&gt;</span> dta2020<span class="sc">$</span>votes_dem,<span class="st">&quot;red&quot;</span>,</span>
+<span id="cb2-16"><a href="create-dataset.html#cb2-16" aria-hidden="true" tabindex="-1"></a>                                      <span class="fu">ifelse</span>(dta2020<span class="sc">$</span>votes_gop <span class="sc">&lt;</span> dta2020<span class="sc">$</span>votes_dem,<span class="st">&quot;blue&quot;</span>,</span>
+<span id="cb2-17"><a href="create-dataset.html#cb2-17" aria-hidden="true" tabindex="-1"></a>                                             <span class="st">&quot;purple&quot;</span>)),</span>
+<span id="cb2-18"><a href="create-dataset.html#cb2-18" aria-hidden="true" tabindex="-1"></a>                   <span class="at">pctGOPcategories =</span> <span class="fu">ifelse</span>(pctGOP<span class="sc">&lt;</span><span class="fl">0.48</span>,<span class="st">&quot;0-48%&quot;</span>, </span>
+<span id="cb2-19"><a href="create-dataset.html#cb2-19" aria-hidden="true" tabindex="-1"></a>                                             <span class="fu">ifelse</span>(pctGOP<span class="sc">&lt;</span><span class="fl">0.5</span>,<span class="st">&quot;48-50%&quot;</span>, </span>
+<span id="cb2-20"><a href="create-dataset.html#cb2-20" aria-hidden="true" tabindex="-1"></a>                                                    <span class="fu">ifelse</span>(pctGOP<span class="sc">&lt;</span><span class="fl">0.52</span>, <span class="st">&quot;50-52%&quot;</span>,</span>
+<span id="cb2-21"><a href="create-dataset.html#cb2-21" aria-hidden="true" tabindex="-1"></a>                                                           <span class="st">&quot;52-100%&quot;</span>))),</span>
+<span id="cb2-22"><a href="create-dataset.html#cb2-22" aria-hidden="true" tabindex="-1"></a>                   <span class="at">stdVotes =</span> (totalVotes<span class="sc">-</span><span class="fu">min</span>(totalVotes))<span class="sc">/</span>(<span class="fu">max</span>(totalVotes)<span class="sc">-</span><span class="fu">min</span>(totalVotes)),</span>
+<span id="cb2-23"><a href="create-dataset.html#cb2-23" aria-hidden="true" tabindex="-1"></a>                   <span class="at">stdVotesLog =</span> (<span class="fu">log</span>(totalVotes)<span class="sc">-</span><span class="fu">min</span>(<span class="fu">log</span>(totalVotes)))<span class="sc">/</span>(<span class="fu">max</span>(<span class="fu">log</span>(totalVotes))<span class="sc">-</span><span class="fu">min</span>(<span class="fu">log</span>(totalVotes)))</span>
+<span id="cb2-24"><a href="create-dataset.html#cb2-24" aria-hidden="true" tabindex="-1"></a>                   )</span>
+<span id="cb2-25"><a href="create-dataset.html#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="create-dataset.html#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="create-dataset.html#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="create-dataset.html#cb2-28" aria-hidden="true" tabindex="-1"></a>dta2020 <span class="ot">&lt;-</span> dta2020 <span class="sc">%&gt;%</span> </span>
+<span id="cb2-29"><a href="create-dataset.html#cb2-29" aria-hidden="true" tabindex="-1"></a>            <span class="fu">select</span>(<span class="at">FIPS =</span>  county_fips, pctGOP, totalVotes, winner, pctWinner, pctGOPcategories, FontColorWinner, stdVotes, stdVotesLog)</span>
+<span id="cb2-30"><a href="create-dataset.html#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="create-dataset.html#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="create-dataset.html#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="do">## merge GIS data with voting data using FIPS code</span></span>
+<span id="cb2-33"><a href="create-dataset.html#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-34"><a href="create-dataset.html#cb2-34" aria-hidden="true" tabindex="-1"></a>countyGIS <span class="ot">&lt;-</span> <span class="fu">left_join</span>(countyGIS,dta2020,<span class="at">by=</span><span class="st">&quot;FIPS&quot;</span>)</span></code></pre></div>
+<p><code>countyGIS</code> is what we’ll use to make the maps, along with <code>stateGIS</code> to draw state borders</p>
+<p>When you want to make maps of other variables obtained from tidycensus, you can call tidycensus again (this time with geometry = FALSE, keep_geo_vars = FALSE) to obtain a new variables and then merge it onto <code>countyGIS</code> just like we merged the election data (<code>dta2020</code>) onto countyGIS above.
+&lt;span style=“color: red; font-weight:bold”“&gt;Do NOT re-download the geo vars every time.</span>
+If you download them every time, it will make the files get really big and slow. You might not be able to build at all, and probably won’t be able to commit/push.</p>
+</div>
+<div id="popup-labels" class="section level2" number="2.3">
+<h2><span class="header-section-number">2.3</span> Popup labels</h2>
+<p>We also need to make the text (with HTML for formatting) to use in popup labels for each county.
+First we create the text that will make up the labels, along with HTML formatting (e.g., <code>&lt;b&gt;</code> to make the county name bold, font color to make it red when Trump wins and blue when Biden wins).
+Then we pipe that to the HTML function from the <code>htmltools</code> package that turns our text into HTML code that leaflet can use to make popups in the map.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="create-dataset.html#cb3-1" aria-hidden="true" tabindex="-1"></a>popupLabels <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;&lt;b&gt;&quot;</span>,countyGIS<span class="sc">$</span>name,<span class="st">&quot; (&quot;</span>,countyGIS<span class="sc">$</span>FIPS,<span class="st">&quot;)&lt;/b&gt;&quot;</span>,</span>
+<span id="cb3-2"><a href="create-dataset.html#cb3-2" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;&lt;br&gt;&lt;font color=&#39;&quot;</span>,countyGIS<span class="sc">$</span>FontColorWinner,<span class="st">&quot;&#39;&gt;&quot;</span>,countyGIS<span class="sc">$</span>winner, </span>
+<span id="cb3-3"><a href="create-dataset.html#cb3-3" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;: &quot;</span>,</span>
+<span id="cb3-4"><a href="create-dataset.html#cb3-4" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">format</span>(countyGIS<span class="sc">$</span>pctWinner<span class="sc">*</span><span class="dv">100</span>,<span class="at">digits=</span><span class="dv">4</span>, <span class="at">trim=</span><span class="cn">TRUE</span>),</span>
+<span id="cb3-5"><a href="create-dataset.html#cb3-5" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;%&lt;/font&gt;&quot;</span>,</span>
+<span id="cb3-6"><a href="create-dataset.html#cb3-6" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;&lt;br&gt;Total votes: &quot;</span>, <span class="fu">format</span>(countyGIS<span class="sc">$</span>totalVotes,<span class="at">big.mark=</span><span class="st">&quot;,&quot;</span>, <span class="at">trim=</span><span class="cn">TRUE</span>)</span>
+<span id="cb3-7"><a href="create-dataset.html#cb3-7" aria-hidden="true" tabindex="-1"></a>                    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-8"><a href="create-dataset.html#cb3-8" aria-hidden="true" tabindex="-1"></a>              <span class="fu">lapply</span>(htmltools<span class="sc">::</span>HTML)</span></code></pre></div>
+<p>Note that in this example, we’re creating the popup labels one time and we’ll use them in each map (since all the maps show the same data, just using different color schemes).
+For the CP you will create several maps that show different variables.
+For that, you need to create new popup labels for each map.</p>
+<p>I suggest you try to make changes to the popup labels below and see what they look like in the map.
+Note that the parts in <code>&lt;&gt;</code> are HTML formatting. For example <code>&lt;b&gt;text&lt;/b&gt;</code> makes the word “text” bold (like <b>this</b>).
+You aren’t expected to already know any HTML.
+You are, however, expected to be able to look online and figure it out.
+(Remember, becoming confident figuring out new skills on your own is one of the main goals of the course.)</p>
+<p>Note that if when you create a map you get an error message similar to “cannot coerce type ‘closure’ to vector of type ‘character’,” it might be a problem with your popup labels.</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="census-data-from-the-tidycensus-package.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="election-map-bins.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/econ380w21/YOUR REPO NAME/edit/master/02-Create_Dataset.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": "https://github.com/econ380w21/YOUR REPO NAME/commits/master/02-Create_Dataset.Rmd",
+"text": null
+},
+"view": {
+"link": "https://github.com/econ380w21/YOUR REPO NAME/blob/master/02-Create_Dataset.Rmd",
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

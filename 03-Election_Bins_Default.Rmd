@@ -1,0 +1,43 @@
+# Election Map: Bins
+
+On this page we'll build our first map interactive web-based map of geospatial data using [Leaflet](https://leafletjs.com). 
+You have most likely interacted with maps made with Leaflet when reading articles online or on the websites of businesses, non-profits, universities, and government agencies. 
+After working through this "book" you should be able to make leaflet maps yourself (and you'll need to for the CP).
+
+Leaflet was initially a javascript library used to include interactive maps on websites. 
+The `leaflet` R package allows you to create Leaflet maps from R, combining the data-analytic capabilities of R with the ability to create maps communicating your analysis that can be put directly on websites. 
+
+The data for this map, and all those that follow, was create in the [Create Dataset] chapter. 
+
+
+```{r, message=FALSE, warning=FALSE}
+## create color palette used by map
+pal <- colorBin("RdBu", countyGIS$pctGOP, n = 9, reverse=TRUE)
+
+leaflet(countyGIS, options = leafletOptions(crsClass = "L.CRS.EPSG3857"), width="100%") %>%
+  addPolygons(weight = 0.5, color = "gray", opacity = 0.7,
+    fillColor = ~pal(pctGOP), fillOpacity = 1, smoothFactor = 0.5,
+    label = popupLabels,
+    labelOptions = labelOptions(direction = "auto")) %>%
+    addPolygons(data = stateGIS,fill = FALSE,color="black",weight = 1) %>%
+    addLegend(pal = pal,values = ~countyGIS$pctGOP, opacity = 0.7, title = "% Trump",position = "bottomright")
+
+```
+
+When you first look at the code above, you likely have no idea what most parts of it do. 
+That's completely fine--and expected. 
+When I created my first leaflet map, I didn't know what most of the parts did either. 
+I played around with it and looked online until I figured it out. 
+It is now your turn to do the same. 
+
+Remember part of the goal is to improve your ability to figure things out on your own. 
+If you can't figure out new things on your own, then the skills you leave Lawrence with will be the only skills you use for the rest of your life. 
+If that's the type of job you want, you probably don't actually want a liberal arts education.  
+
+
+The rest of this file has versions of the map above that use different color schemes to display the same data. 
+Spend some time thinking about how the different color schemes convey different messages, despite being base on the same data.
+
+
+
+

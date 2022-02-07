@@ -1,0 +1,35 @@
+# Census Data from the Tidycensus Package
+
+
+We're going to get most of the data from the [US Census Bureau](https://www.census.gov/) using the [tidycensus](https://walker-data.com/tidycensus) package. 
+<span style="color: red; font-weight:bold">Before going through the rest of this "book", you should go through this brief tutorial on the tidycensus package:</span>
+
+https://walker-data.com/tidycensus/articles/basic-usage.html
+
+Usually a few people ask about the Census API key. You need to request a Census API key from the link in the tutorial (you can use "Lawrence University for "Organization Name"). You need to do the `census_api_key("YOUR API KEY GOES HERE")` part to store the API key. Don't put that code into your RMD file. You should run it once so that it's stored in .Renviron and then not have to run it again. 
+
+This page has a few more details that are often helpful: 
+https://walker-data.com/tidycensus/reference/census_api_key.html. After you store it the first time, you either need to go to Session > Restart R, or run `readRenviron("~/.Renviron")` But don't put that into the code--you don't want to re-load .Renviron every time.  
+
+To be clear, going through that tutorial is how you learn to use the package. Work through it and make sure you can do their examples. Try making a few changes (e.g., request a different variable) and make sure it works. 
+
+The function we'll use most is `get_acs()`. Go through the examples on that function's detailed description (https://walker-data.com/tidycensus/reference/get_acs.html). Try making a few changes to the provided example. 
+For example, it creates a graph of median household income in Tarrant County, Texas. 
+Try removing the part that specifies the county. You should see a map of all of Texas. 
+Try changing the state to a different state (e.g., `state = "WI"` instead of `state = "TX"`). 
+You can also try mapping a different variable (e.g., population instead of median household income). 
+
+You could add a code chunk below to put together your examples. Then you'll have them later if you need to figure something out again. 
+
+
+## Figure out how to get multiple variables at one time
+
+For the CP you will need to get around 10 variables from the ACS. You should figure out how to use `get_acs()` to accomplish this. Experiment using `c()` to list the variables you want and give that list to the `variables` argument of `get_acs()`. 
+You should also be able to re-name the variables something recognizable at the same time (their example includes `variables = c(medincome = "B19013_001")`, and you can do the same thing listing multiple variables, each with a human-readable name like `medincome`).
+Also check out the `output = "wide"` option. 
+Figuring this out will make the CP much easier. 
+
+
+Once you are able to get data from the Census Bureau using the tidycensus package, you are ready to move on. 
+
+

@@ -1,0 +1,14 @@
+census-data-from-the-tidycensus-package
+figure-out-how-to-get-multiple-variables-at-one-time
+create-dataset
+gis-data-download-and-preparation
+election-data-download-and-preparation
+popup-labels
+election-map-bins
+election-map-custom-bins
+election-map-continuous-with-2-colors
+election-map-continuous-with-3-colors
+election-map-4-categories
+election-map-4-categories-opacity-by-log-of-total-votes
+election-map-4-categories-opacity-by-total-votes
+total-votes-map

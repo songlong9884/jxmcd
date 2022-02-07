@@ -1,0 +1,43 @@
+# Total Votes Map
+
+This final map shows total votes to give you a better idea of how the population is distributed around the US (it would be good practice if you create a map that shows total population).
+This map also demonstrates a different type of color palette. 
+
+```{r, message=FALSE, warning=FALSE}
+## Custom bins to show total votes
+pal <- colorBin(c("white","yellow","cyan","green","purple","magenta"), countyGIS$totalVotes,bins = c(min(countyGIS$totalVotes),
+                                                       25000,
+                                                       50000,
+                                                       100000,
+                                                       500000,
+                                                       1000000,
+                                                       max(countyGIS$totalVotes)))
+
+leaflet(countyGIS, options = leafletOptions(crsClass = "L.CRS.EPSG3857"), width="100%") %>%
+  addPolygons(weight = 0.5, color = "gray", opacity = 0.7,
+    fillColor = ~pal(totalVotes), fillOpacity = 1, smoothFactor = 0.5,
+    label = popupLabels,
+    labelOptions = labelOptions(direction = "auto")) %>%
+    addPolygons(data = stateGIS,fill = FALSE,color="black",weight = 1) %>%
+    addLegend(pal = pal,values = ~countyGIS$totalVotes, opacity = 0.7, title = "Total Votes",position = "bottomright")
+
+```
+
+
+Look closely at the legend. 
+The white color counties start with the minimum number of votes cast in a county (`r min(countyGIS$totalVotes)`) up to only 25,000; this is the vast majority of the country. 
+This gives you an idea of how misleading the standard choropleth map can be. 
+
+That said, these types of maps also convey a lot of information in a compact and interactive way. 
+But when you create maps like these, you need to think carefully about the clarity of what you're conveying with your map. 
+In addition to hopefully making that point, this bookdown "book" of maps also demonstrates how you can create maps for your projects.
+There are many other color palette you can use. 
+You want to think carefully about what you use for your project. 
+Don't just pick whatever you try first or think looks pretty. 
+
+In general, it's best to use the same scale for similar maps. 
+People get used to looking at it and it makes it easier to understand.
+However, don't use the same scale for different maps for the same reason (people get used to it meaning one thing and then miss that the meaning has changed). 
+So, you should give the design of your maps some careful thought. 
+
+

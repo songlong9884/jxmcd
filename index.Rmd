@@ -1,0 +1,98 @@
+--- 
+title: "Creating Interactive Maps of Census Data Using Leaflet and Tidycensus"
+author: ""
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+bibliography: references.bib
+biblio-style: apalike
+link-citations: yes
+---
+
+
+# Preface {-}
+
+This bookdown "book" provides examples of two skills you will need for the CP: 
+
+1. Obtaining U.S. Census Data from the Census API via the tidycensus package
+
+1. Creating interactive maps using leaflet
+
+
+The skills used in this file (and that you'll use for the CP) combine a lot of the skills you've learned in your BP.
+You haven't used the Census API (or likely any API) or built interactive maps, but these are examples of the types of skills you should be capable of figuring out on your own using examples (such as the examples included in this "book"). 
+Being able to figure out how to do new things like this is one of the key skills you should seek to develop in this course. 
+
+
+Go through the examples carefully and make sure you understand them.
+This is usually best accomplished by modifying the examples and seeing if the changes you make are what appear in the output.
+For example, change the variable displayed in a map.
+Do this one little step at a time so that if there is an error, you know exactly which part didn't work.
+First, change the variable in the data used in the map.
+Then map it.
+Then modify the legend. Then modify the popups.
+Then try changing the color scale.
+With each little change you make, you don't venture too far from an example that already works. This makes it much easier to figure out what's not working when errors occur (and they will...don't expect everything to work on your first try).
+If you try to make all these changes at once and it doesn't build, you often have a harder time figuring out which part(s) doesn't work. 
+
+## Practice this process {-}
+
+This process is a great way to learn new skills on your own. It's likely a new experience for many students. Often people are used to doing exactly what they are told to for an assignment, and nothing else. But this type of skill-building on your own is a crucial skill in general for being successful on your own (e.g., at an internship or job, in grad school). Hopefully this process gives you confidence that you can do a lot more on your own than you might currently realize. 
+
+
+## DataCamp {-}
+
+Note that there are DataCamp courses that go through use of the tidycensus and leaflet packages.
+You are free to go through those too (or any resources you find online).
+But going through what I included in this file should be sufficient (probably with some Googling of a few parts you're unsure about).
+There is no BP chapter required for this material.
+The CP should be enough incentive for you to want to learn how to use these skills.
+And including all this in the BP would slow it down considerably, so I've left this as a separate "book".
+(Although after the term is over, you might consider adding a version of this to your BP for future reference.)
+
+
+
+## Bookdown Options {-}
+
+Note that for this bookdown book, in the file `_bookdown.yml` the option is set to `new_session: false`.
+This means that when you build the book, it essentially puts all of the separate RMD files together into one long RMD file and knits it.
+This allows you to create R objects (e.g., dataframes) in an earlier RMD file and use them in later RMD files.
+That way you can create a data frame once and then use it in later RMD files. 
+
+
+This is different from the BP where the option is set to `new_session: true` (or, actually, `new_session: yes`...true and yes are different in may situations, but in this case, they do the same thing).
+For the BP, each RMD is separate.
+This makes sense for the BP.
+If you create a `mydata` data frame in one chapter you don't want to accidentally use that same `mydata` in a different chapter.
+But for this example book, we want to use the same data throughout the book.
+It takes awhile to download and create the data, so we don't want to have to do it again on in each RMD file.
+But it's nice to separate the content across multiple RMD files.
+This would facilitate collaboration if I was working on this with a group (such as you will be doing for the projects).
+It also makes each individual HTML file smaller, which works better with Git/GitHub.
+
+## New Sentence, New Line {-}
+
+Finally, look at the `index.RMD` file that creates this preface. Note the way the paragraphs are typed into the RMD file. 
+Each **sentence** is on a new line, and each paragraph is started by having a blank line (I typically use 2 blank lines between paragraphs to make them easier to see, but 1 blank line is sufficient).
+This is how you should do your writing in RMD files (so, so this for the projects). 
+
+
+It takes a little getting used to, but it has significant benefits.
+Git/GitHub does everything based on lines.
+When every sentence is it's own line in the RMD file, you can see which sentences have been modified with each commit. 
+This makes revision much easier.
+It also makes it easier to avoid"merge" errors (when two people edit the same paragraph and then both try to commit and push), and to fix them when they do occur. 
+
+
+## RStudio Cloud Memory {-}
+
+This file has a lot of maps that take up a fair amount of RAM.
+If you run the code chunks, that data and maps will take up a lot of RStudio Cloud's RAM.
+If you then build the book, you might get an error (I've gotten one that says: "The previous R session was abnormally terminated due to an unexpected crash.").
+If you "clear objects from the workspace (click on the broom icon on the Environment tab) before building, I don't think you'll get an error. 
+
+
+## Use this for your CP {-}
+
+
+For the CP you are free to copy code from this "book" as a starting point and modify it.
+So, the skills you learn will be directly useful for the CP, but also keep the bigger picture in mind too.

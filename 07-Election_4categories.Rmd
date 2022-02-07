@@ -1,0 +1,60 @@
+# Election Map: 4 Categories
+
+```{r, echo = FALSE, include = FALSE}
+fewestVotes <- countyGIS %>% 
+  filter(totalVotes == min(totalVotes)) %>%
+  select(name, pop, totalVotes)
+
+mostVotes <- countyGIS %>% 
+  filter(totalVotes == max(totalVotes)) %>%
+  select(name, pop, totalVotes)
+```
+
+This map uses 4 custom-labeled factors. 
+This map is similar to what you often see on the news, displaying either red or blue. 
+However, this one highlights close counties in slightly different colors. 
+As you can see, there aren't very many close counties (something that's impossible to see on a two-color map). 
+
+
+
+
+```{r, message=FALSE, warning=FALSE}
+pal <- colorNumeric(
+  palette = colorRampPalette(c('red', 'white', 'blue'))(length(countyGIS$pctGOP)), 
+  domain = countyGIS$pctGOP, reverse=TRUE)
+
+factorPal <- colorFactor(c("blue", "cyan", "magenta", "red"), countyGIS$pctGOPcategories )
+
+leaflet(countyGIS, options = leafletOptions(crsClass = "L.CRS.EPSG3857"), width="100%") %>%
+  addPolygons(weight = 0.5, color = "gray", opacity = 0.7,
+    fillColor = ~factorPal(pctGOPcategories), fillOpacity = 1, smoothFactor = 0.5,
+    label = popupLabels,
+    labelOptions = labelOptions(direction = "auto")) %>%
+    addPolygons(data = stateGIS,fill = FALSE,color="black",weight = 1) %>%
+    addLegend(pal = factorPal,values = ~countyGIS$pctGOPcategories, opacity = 0.7, title = "% Trump",position = "bottomright")
+
+```
+
+
+
+What you see is a mostly red country with small pockets of blue and a few close counties. 
+What you don't see in this map is anything about population. 
+That is a significant limitation to this type of map. 
+All counties seem to count equally when you look at the map. 
+However, some counties have many times more people than other counties. 
+The county with the most votes is `r mostVotes$name` (total population `r format(mostVotes$pop ,big.mark=",")`, total votes `r format(mostVotes$totalVotes,big.mark=",")`).
+The county with the fewest votes is `r fewestVotes$name` (total population `r format(fewestVotes$pop ,big.mark=",")`, total votes `r format(fewestVotes$totalVotes,big.mark=",")`).
+
+
+"Land doesn't vote, people do" is the phrase often associated by the bias created by this type of visualization. 
+To get a better sense of this yourself, you can explore the data a bit more. Look at the smallest, say, 1000 counties and see how they voted. Compare that to the largest counties and see how they voted. 
+If you start adding up the populations of the smallest counties, how many counties do you have to add up to reach the population of the single largest county? 
+Look into a few of these things to get a better sense for the data, and thus for what is conveyed by these types of maps. 
+This is not to say that these types of maps aren't useful, but choosing a good color scheme is important, and difficult. 
+
+Here is a specific challenge to test your skills, and get better intuition for how population is distributed in the US. 
+Find the population of the largest county.
+Figure out how many of the smallest counties you have to add up to reach the population of the largest county (is it the 100 smallest, population-wise, counties, the smallest 500, 1000?).
+Then create a map that displays the largest county in one color and all the smallest counties it takes to add up to the same population in a different color. 
+
+

@@ -1,0 +1,157 @@
+# Create Dataset
+
+Now that you know how to use the tidycensus package download data from the US Census Bureau using the Census API, we are ready to put together the data we need to make an interactive map. 
+
+## GIS data download and preparation
+
+First we're going to download the geographic data we need to create maps.
+See the comments in the code below for explanations of what each part is doing.
+I kept it all together in one code chunk with comments to make it easier to re-use elsewhere (e.g., as part of your CP).
+
+```{r, message=FALSE, warning=FALSE, include=TRUE}
+library(tidyverse)
+library(leaflet)
+library(rmapshaper)
+library(tidycensus)
+options(tigris_use_cache = TRUE)
+
+## turn off scientific notation
+options(scipen = 999)
+
+
+## Download GIS data for maps
+##   geometry = TRUE --> include GIS shapefile data to create maps
+##   B01001_001: total population
+##   NOTE: When you download the county data for the regressions, use options: geometry = False, keep_geo_vars = FALSE
+
+# Median household income
+countyGIS <- get_acs(geography = "county",
+              variables = "B01001_001",
+              geometry = TRUE,
+              keep_geo_vars = TRUE)
+
+# State data (for displaying state borders on map)
+stateGIS <- get_acs(geography = "state",
+              variables = "B01001_001",
+              geometry = TRUE,
+              keep_geo_vars = FALSE)
+
+
+## Simplify GIS data to make file sizes smaller. This essentially removes some details along coastlines and very-not-straight borders. 
+stateGIS <- ms_simplify(stateGIS, keep = 0.01)
+countyGIS <- ms_simplify(countyGIS, keep = 0.01)
+
+
+countyGIS <- countyGIS %>% 
+                select(FIPS = GEOID, 
+                       stFIPS = STATEFP, 
+                       coFIPS = COUNTYFP, 
+                       coNAME = NAME.x, 
+                       pop = estimate, 
+                       geometry)
+
+
+## For mapping, let's drop the following: 
+##   Puerto Rico (ST FIPS 72) (no election data)
+##   Alaska (ST FIPS 02) (voting data isn't reported by county...we could also map the legislative districts, but we're not going to since we'd rather have smaller maps without those extra details)
+##   Hawaii (ST FIPS 15) (so our map can zoom in on continental 48 states)
+countyGIS <- countyGIS %>% filter(stFIPS != "72" & stFIPS != "02" & stFIPS != "15")
+stateGIS <- stateGIS %>% filter(GEOID != "72" & GEOID != "02" & GEOID != "15")
+
+
+## join 2-character state abbreviation and create name = "county, St" for labeling maps (e.g., Outagamie, WI) 
+fipsToSTcode <- fips_codes %>% select(stFIPS = state_code, stNAME = state) %>% unique()
+
+countyGIS <- inner_join(countyGIS,fipsToSTcode,by="stFIPS")
+
+countyGIS <- countyGIS %>% mutate(name = paste0(coNAME,", ", stNAME))
+
+
+
+## NOTE: If you don't use keep_geo_vars = TRUE, you don't get separate STATEFP and COUNTYFP, but you can use mutate() and create stFIPS = substr(GEOID,1,2) and coFIPS = substr(GEOID,3,5)
+```
+
+
+
+
+## Election data download and preparation
+
+Now we're going to download 2020 county-level election results from a GitHub repo.
+You can read more about the data [in the repo](https://github.com/tonmcg/US_County_Level_Election_Results_08-20). 
+
+
+```{r, message=FALSE, warning=FALSE, include=TRUE}
+## 2020 Election data
+dta2020 <- read_csv("https://raw.githubusercontent.com/tonmcg/US_County_Level_Election_Results_08-20/master/2020_US_County_Level_Presidential_Results.csv")
+
+## Calculate percentages based on total votes for Trump and Biden (GOP and Dem) only
+##   In some years there have been ties, so we're allowing for that
+##   stdVotes and stdVotesLog will be used to scale color opacity from 0 to 1 based on total votes
+
+dta2020 <- dta2020 %>% 
+            mutate(pctGOP = votes_gop/(votes_gop + votes_dem),
+                   totalVotes = votes_gop + votes_dem,
+                   winner = ifelse(dta2020$votes_gop > dta2020$votes_dem,"Trump",
+                                   ifelse(dta2020$votes_gop < dta2020$votes_dem,"Biden", 
+                                          "Tie")),
+                   pctWinner = ifelse(dta2020$votes_gop > dta2020$votes_dem,pctGOP,1-pctGOP),
+                   FontColorWinner = ifelse(dta2020$votes_gop > dta2020$votes_dem,"red",
+                                      ifelse(dta2020$votes_gop < dta2020$votes_dem,"blue",
+                                             "purple")),
+                   pctGOPcategories = ifelse(pctGOP<0.48,"0-48%", 
+                                             ifelse(pctGOP<0.5,"48-50%", 
+                                                    ifelse(pctGOP<0.52, "50-52%",
+                                                           "52-100%"))),
+                   stdVotes = (totalVotes-min(totalVotes))/(max(totalVotes)-min(totalVotes)),
+                   stdVotesLog = (log(totalVotes)-min(log(totalVotes)))/(max(log(totalVotes))-min(log(totalVotes)))
+                   )
+
+
+
+dta2020 <- dta2020 %>% 
+            select(FIPS =  county_fips, pctGOP, totalVotes, winner, pctWinner, pctGOPcategories, FontColorWinner, stdVotes, stdVotesLog)
+
+
+## merge GIS data with voting data using FIPS code
+
+countyGIS <- left_join(countyGIS,dta2020,by="FIPS")
+```
+
+`countyGIS` is what we'll use to make the maps, along with `stateGIS` to draw state borders
+
+When you want to make maps of other variables obtained from tidycensus, you can call tidycensus again (this time with geometry = FALSE, keep_geo_vars = FALSE) to obtain a new variables and then merge it onto `countyGIS` just like we merged the election data (`dta2020`) onto countyGIS above.
+<span style="color: red; font-weight:bold"">Do NOT re-download the geo vars every time.</span>
+If you download them every time, it will make the files get really big and slow. You might not be able to build at all, and probably won't be able to commit/push. 
+
+## Popup labels
+
+We also need to make the text (with HTML for formatting) to use in popup labels for each county.
+First we create the text that will make up the labels, along with HTML formatting (e.g., `<b>` to make the county name bold, font color to make it red when Trump wins and blue when Biden wins). 
+Then we pipe that to the HTML function from the `htmltools` package that turns our text into HTML code that leaflet can use to make popups in the map. 
+
+
+```{r}
+popupLabels <- paste0("<b>",countyGIS$name," (",countyGIS$FIPS,")</b>",
+                    "<br><font color='",countyGIS$FontColorWinner,"'>",countyGIS$winner, 
+                    ": ",
+                    format(countyGIS$pctWinner*100,digits=4, trim=TRUE),
+                    "%</font>",
+                    "<br>Total votes: ", format(countyGIS$totalVotes,big.mark=",", trim=TRUE)
+                    ) %>% 
+              lapply(htmltools::HTML)
+```
+
+Note that in this example, we're creating the popup labels one time and we'll use them in each map (since all the maps show the same data, just using different color schemes). 
+For the CP you will create several maps that show different variables. 
+For that, you need to create new popup labels for each map. 
+
+I suggest you try to make changes to the popup labels below and see what they look like in the map. 
+Note that the parts in `<>` are HTML formatting. For example `<b>text</b>` makes the word "text" bold (like <b>this</b>). 
+You aren't expected to already know any HTML. 
+You are, however, expected to be able to look online and figure it out. 
+(Remember, becoming confident figuring out new skills on your own is one of the main goals of the course.)
+
+
+Note that if when you create a map you get an error message similar to "cannot coerce type 'closure' to vector of type 'character'", it might be a problem with your popup labels. 
+
+

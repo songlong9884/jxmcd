@@ -1,0 +1,24 @@
+# Election Map: 4 Categories Opacity by Total Votes
+
+This is the same map as the previous page, except not taking the log of total votes. 
+A few counties have significantly higher populations (and thus total votes).
+
+```{r, message=FALSE, warning=FALSE}
+## Now use 4 custom-labeled factors, with opacity set based on total votes (re-scaled without taking log)
+pal <- colorNumeric(
+  palette = colorRampPalette(c('red', 'white', 'blue'))(length(countyGIS$pctGOP)), 
+  domain = countyGIS$pctGOP, reverse=TRUE)
+
+factorPal <- colorFactor(c("blue", "cyan", "magenta", "red"), countyGIS$pctGOPcategories )
+
+leaflet(countyGIS, options = leafletOptions(crsClass = "L.CRS.EPSG3857"), width="100%") %>%
+  addPolygons(weight = 0.5, color = "gray", opacity = 0.7,
+    fillColor = ~factorPal(pctGOPcategories), fillOpacity = countyGIS$stdVotes, smoothFactor = 0.5,
+    label = popupLabels,
+    labelOptions = labelOptions(direction = "auto")) %>%
+    addPolygons(data = stateGIS,fill = FALSE,color="black",weight = 1) %>%
+    addLegend(pal = factorPal,values = ~countyGIS$pctGOPcategories, opacity = 0.7, title = "% Trump",position = "bottomright")
+
+```
+
+
